@@ -8,9 +8,9 @@ Expand on the readme questions below to provide an overview of the goals, backgr
 
 ## Introduction
 
-This is a final project for the [Interacting with Data](https://github.com/Brown-BIOL2430-S04-Fall2015/syllabus) seminar in fall 2015. This project (a very brief, ie 1-2 sentence, overview of the project)...
+This is a final project for the [Interacting with Data](https://github.com/Brown-BIOL2430-S04-Fall2015/syllabus) graduate seminar that took place in the fall of 2015. We set out to build an interactive visualization that illustrates the Central Limit Theorem, an important statistical result. 
 
-To view this project, ... (embed visualization here or provide instructions on how to view the project).
+To view the complete visualization, click here (embed visualization here or provide instructions on how to view the project). Read on to learn more about the project.
 
 ## The data
 
