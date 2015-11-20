@@ -32,8 +32,18 @@
 	<body>
 	<h1>A 2-Dimensional Visualization of the Central Limit Theorem</h1>
 	<h3>Uniform Distribution</h3>
-		<p class="n1">Click to generate the average of eight data points!</p>
+		<p class="n1">Click to generate the average of <span id="sampleSize-value">…</span> points!</p>
 		<p class="n1000">Click to generate a thousand averages!</p>
+		
+		<!-- sample size slider -->
+		<p>
+		  <label for="sampleSize" 
+		         style="display: inline-block; width: 120px; text-align: left">
+		         Sample size = <span id="sampleSize-value1">…</span>
+		  </label>
+		  <input type="range" min="1" max="25" step="1" value="10" id="sampleSize">
+		</p>		
+
 		<script type="text/javascript">
 
 			//Width and height and ticks
@@ -41,17 +51,41 @@
 			var w = 500;
 			var h = 500;
 			var padding = 30;
-			
+			var alpha = 0.1;
+
 			//Dynamic, random dataset
 			var means = [];
-			var dataset = [];											//Initialize empty array
-			var numDataPoints = 8;										//Number of dummy data points to create
-			var maxRange = 100;						//Max range of new values
-			for (var i = 0; i < numDataPoints; i++) {					//Loop numDataPoints times
-				var newNumber1 = Math.random() * maxRange;	//New random integer
-				var newNumber2 = Math.random() * maxRange;	//New random integer
-				dataset.push([newNumber1, newNumber2]);					//Add new number to array
+			var dataset = [];		   //Initialize empty array
+			var numDataPoints = 10; //Number of dummy data points to create
+			var maxRange = 100;		 //Max range of new values
+			
+		//	for (var i = 0; i < numDataPoints; i++) {			//Loop numDataPoints times
+		//		var newNumber1 = Math.random() * maxRange;	//New random integer
+		//		var newNumber2 = Math.random() * maxRange;	//New random integer
+		//		dataset.push([newNumber1, newNumber2]);			//Add new number to array
+		//	}
+
+			// slider update
+			d3.select("#sampleSize").on("input", function() {
+  			update(+this.value);
+			});
+
+			update(10);
+
+			function update(n) {
+			  // adjust the text on the range slider
+			  d3.select("#sampleSize-value").text(n);
+			  d3.select("#sampleSize-value1").text(n);
+			  numDataPoints = n;
+			  //d3.select("#sampleSize").property("value", n);
+
+			  // update the circle radius
+			//  holder.selectAll("circle") 
+			 //   .attr("r", nRadius);
 			}
+
+
+
 
 			//Create scale functions
 			var xScale = d3.scale.linear()
@@ -81,18 +115,18 @@
 						.attr("height", h);
 
 			//Create circles
-			svg.selectAll("circle")
-			   .data(dataset)
-			   .enter()
-			   .append("circle")
-			   .attr("cx", function(d) {
-			   		return xScale(d[0]);
-			   })
-			   .attr("cy", function(d) {
-			   		return yScale(d[1]);
-			   })
-			   .attr("r", 2)
-			   .attr("class", "datapoints");
+			//svg.selectAll("circle")
+			//   .data(dataset)
+			//   .enter()
+			//   .append("circle")
+			//   .attr("cx", function(d) {
+			//   		return xScale(d[0]);
+			//   })
+			//   .attr("cy", function(d) {
+			//      return yScale(d[1]);
+			//   })
+			//   .attr("r", 2)
+			//   .attr("class", "datapoints");
 			
 			//Create X axis
 			svg.append("g")
@@ -111,31 +145,6 @@
 			//On click, update with new data			
 			d3.select("p.n1")
 				.on("click", function() {
-
-					var sumX = 0;
-					var sumY = 0;
-					for (var i=0; i < dataset.length; i++){
-						sumX = sumX + dataset[i][0];
-						sumY = sumY + dataset[i][1];
-					}
-					var meanX = sumX / dataset.length
-					var meanY = sumY / dataset.length
-					means.push([meanX,meanY]);
-
-					svg.selectAll("circle.datapoints")
-					   .transition()
-					   .delay(300)
-   					   .duration(1000)
-					   .attr("cx", xScale(meanX))
-					   .attr("cy", yScale(meanY));
-
-					svg.append("circle")
-			   		.attr("cx", xScale(meanX))
-			   		.attr("cy", yScale(meanY))
-			   		.attr("r", 4)
-			   		.attr("fill", "rgba(0, 0, 0, 0.1)")
-			   		.attr("class", "meanpoints");
-
 					dataset = [];  						 				 		//Initialize empty array
 					for (var i = 0; i < numDataPoints; i++) {				 		//Loop numValues times
 						var newNumber1 = Math.random() * maxRange;	//New random integer
@@ -143,8 +152,20 @@
 						dataset.push([newNumber1, newNumber2]);					//Add new number to array
 					}
 
+					var sumX = 0;
+					var sumY = 0;
+					for (var i = 0; i < dataset.length; i++){
+						sumX = sumX + dataset[i][0];
+						sumY = sumY + dataset[i][1];
+					}
+					var meanX = sumX / dataset.length
+					var meanY = sumY / dataset.length
+					means.push([meanX,meanY]);					
+
 					svg.selectAll("circle.datapoints")
 			   		.data(dataset)
+			   		.enter()
+			   		.append("circle")
 			   		.attr("cx", function(d) {
 			   			return xScale(d[0]);
 			   		})
@@ -153,6 +174,24 @@
 			   		})
 			   		.attr("r", 2)
 			   		.attr("class", "datapoints");
+
+			   	svg.selectAll("circle.datapoints")
+					   .transition()
+					   .delay(300)
+   					 .duration(1000)
+					   .attr("cx", xScale(meanX))
+					   .attr("cy", yScale(meanY))
+					   .remove()
+					   .each("end", function() {
+					   	 svg.append("circle")
+			   					.attr("cx", xScale(meanX))
+			   					.attr("cy", yScale(meanY))
+			   					.attr("r", 4)
+			   					.attr("fill", "rgba(0, 0, 0, " + alpha/numDataPoints + ")")
+			   					.attr("class", "meanpoints");
+					   });
+
+
 					
 
 				});
@@ -177,7 +216,7 @@
 			   		.attr("cx", xScale(meanX))
 			   		.attr("cy", yScale(meanY))
 			   		.attr("r", 4)
-			   		.attr("fill", "rgba(0, 0, 0, 0.03)")
+			   		.attr("fill", "rgba(0, 0, 0, " + alpha + ")")
 			   		.attr("class", "meanpoints");
 
 			   		svg.selectAll("circle.datapoints")
