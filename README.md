@@ -12,7 +12,7 @@ This is a final project for the [Interacting with Data](https://github.com/Brown
 
 To view the complete visualization, click here (embed visualization here or provide instructions on how to view the project). Read on to learn more about the project.
 
-## The data
+## The Theorem
 
 Description of data...
 
@@ -20,6 +20,12 @@ Description of data...
 - Data structure - what are the variables? How are they organized? What states can they have
 
 ## Background
+
+Ours is not the first attempt to create a visualization of the central limit theorem. In fact, there are even a few CLT visualizations in D3.
+
+
+
+
 
 Examples of previous visualizations of similar data or processes, if any exist... Include links or add images to markdown document... how were data mapped to aesthetics in these previous approaches? Was there filtering?
 
