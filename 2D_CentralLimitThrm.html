@@ -41,8 +41,24 @@
 		         style="display: inline-block; width: 120px; text-align: left">
 		         Sample size = <span id="sampleSize-value1">…</span>
 		  </label>
-		  <input type="range" min="1" max="25" step="1" value="10" id="sampleSize">
-		</p>		
+		  <input type="range" min="1" max="20" step="1" value="10" id="sampleSize">
+		</p>	
+
+		<p>
+		  <label for="xmean" 
+		         style="display: inline-block; width: 120px; text-align: left">
+		         X median = <span id="xmean-value">…</span>
+		  </label>
+		  <input type="range" min="0" max="100" step="1" value="50" id="xmean">
+		</p>	
+
+		<p>
+		  <label for="ymean" 
+		         style="display: inline-block; width: 120px; text-align: left">
+		         Y median = <span id="ymean-value">…</span>
+		  </label>
+		  <input type="range" min="0" max="100" step="1" value="50" id="ymean">
+		</p>	
 
 		<script type="text/javascript">
 
@@ -59,13 +75,8 @@
 			var numDataPoints = 10; //Number of dummy data points to create
 			var maxRange = 100;		 //Max range of new values
 			
-		//	for (var i = 0; i < numDataPoints; i++) {			//Loop numDataPoints times
-		//		var newNumber1 = Math.random() * maxRange;	//New random integer
-		//		var newNumber2 = Math.random() * maxRange;	//New random integer
-		//		dataset.push([newNumber1, newNumber2]);			//Add new number to array
-		//	}
 
-			// slider update
+			// Sample Size slider update
 			d3.select("#sampleSize").on("input", function() {
   			update(+this.value);
 			});
@@ -77,13 +88,33 @@
 			  d3.select("#sampleSize-value").text(n);
 			  d3.select("#sampleSize-value1").text(n);
 			  numDataPoints = n;
-			  //d3.select("#sampleSize").property("value", n);
-
-			  // update the circle radius
-			//  holder.selectAll("circle") 
-			 //   .attr("r", nRadius);
 			}
 
+			// Xmean slider update
+			d3.select("#xmean").on("input", function() {
+  			updatexmean(+this.value);
+			});
+
+			updatexmean(50);
+
+			function updatexmean(n) {
+			  // adjust the text on the range slider
+			  d3.select("#xmean-value").text(n);
+			  xmean = n;
+			}
+
+			// Ymean slider update
+			d3.select("#ymean").on("input", function() {
+  			updateymean(+this.value);
+			});
+
+			updateymean(50);
+
+			function updateymean(n) {
+			  // adjust the text on the range slider
+			  d3.select("#ymean-value").text(n);
+			  ymean = n;
+			}
 
 
 
@@ -113,20 +144,6 @@
 						.append("svg")
 						.attr("width", w)
 						.attr("height", h);
-
-			//Create circles
-			//svg.selectAll("circle")
-			//   .data(dataset)
-			//   .enter()
-			//   .append("circle")
-			//   .attr("cx", function(d) {
-			//   		return xScale(d[0]);
-			//   })
-			//   .attr("cy", function(d) {
-			//      return yScale(d[1]);
-			//   })
-			//   .attr("r", 2)
-			//   .attr("class", "datapoints");
 			
 			//Create X axis
 			svg.append("g")
@@ -147,8 +164,16 @@
 				.on("click", function() {
 					dataset = [];  						 				 		//Initialize empty array
 					for (var i = 0; i < numDataPoints; i++) {				 		//Loop numValues times
-						var newNumber1 = Math.random() * maxRange;	//New random integer
-						var newNumber2 = Math.random() * maxRange;	//New random integer
+						if (Math.random() < 0.5) {
+							var newNumber1 = Math.random()*xmean ;}
+						else {
+							var newNumber1 = Math.random()*(100-xmean) + xmean ;
+							 }
+						if (Math.random() < 0.5) {
+							var newNumber2 = Math.random()*ymean ;}
+						else {
+							var newNumber2 = Math.random()*(100-ymean) + ymean ;
+							 }
 						dataset.push([newNumber1, newNumber2]);					//Add new number to array
 					}
 
@@ -224,8 +249,16 @@
 
 					dataset = [];  						 				 		//Initialize empty array
 					for (var i = 0; i < numDataPoints; i++) {				 		//Loop numValues times
-						var newNumber1 = Math.random() * maxRange;	//New random integer
-						var newNumber2 = Math.random() * maxRange;	//New random integer
+						if (Math.random() < 0.5) {
+							var newNumber1 = Math.random()*xmean ;}
+						else {
+							var newNumber1 = Math.random()*(100-xmean) + xmean ;
+							 }
+						if (Math.random() < 0.5) {
+							var newNumber2 = Math.random()*ymean ;}
+						else {
+							var newNumber2 = Math.random()*(100-ymean) + ymean ;
+							 }
 						dataset.push([newNumber1, newNumber2]);					//Add new number to array
 					}
 
