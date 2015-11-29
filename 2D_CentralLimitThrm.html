@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>D3: Transitioning points to randomized values</title>
 
-		<!-- This loads the d3.js script -->
+		<!-- Load the d3.js script -->
 		<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<!-- Define the style for DOM elements -->
 		<style type="text/css">
@@ -30,12 +30,17 @@
 				font-size: 14px;
 			}
 
+			form {
+				font-family: sans-serif;
+				font-size: 14px;
+			}
+
 		</style>
 	</head>
 	<body>
 	<h1>A 2-Dimensional Visualization of the Central Limit Theorem</h1>
 		<p class="n1">Click to generate the average of <span id="sampleSize-value">…</span> points!</p>
-		<p class="n1000">Click to generate a thousand averages!</p>
+		<p class="n1000">Click to generate one thousand averages!</p>
 		<p class="mean">Percentage of averages contained by circle: <span id="radius-percentage">0</span>%</p>
 		<p class="reset">RESET</p>
 
@@ -49,30 +54,29 @@
 		</p>	
 
 		<p>
-		  <label>
-		         X-Axis Probability Distribution:
-		<form>
-		  <input type="radio" id="xUniform" name="xaxis" value="uniform" checked > Uniform 
-		  <input type="radio" id="xNormal" name="xaxis" value="normal"> Normal 
-		  <input type="radio" id="xExponential" name="xaxis" value="exponential"> Exponential
-		</form>
+		  <label> X-Axis Probability Distribution: </label>
+			<form>
+			  <input type="radio" id="xUniform" name="xaxis" value="uniform" checked > Uniform 
+			  <input type="radio" id="xNormal" name="xaxis" value="normal">
+			  Normal 
+			  <input type="radio" id="xExponential" name="xaxis" value="exponential"> Exponential
+			</form>
 		</p>	
 
 		<p>
-		  <label>
-		         Y-Axis Probability Distribution:
-		  </label>
-		<form>
-		  <input type="radio" id="yUniform" name="yaxis" value="uniform" checked > Uniform 
-		  <input type="radio" id="yNormal" name="yaxis" value="normal"> Normal 
-		  <input type="radio" id="yExponential" name="yaxis" value="exponential"> Exponential
-		</form>
+		  <label> Y-Axis Probability Distribution: </label>
+			<form>
+			  <input type="radio" id="yUniform" name="yaxis" value="uniform" checked > Uniform 
+			  <input type="radio" id="yNormal" name="yaxis" value="normal"> 
+			  Normal 
+			  <input type="radio" id="yExponential" name="yaxis" value="exponential"> Exponential
+			</form>
 		</p>
 
 		<p>
 		  <label for="radius" 
 		         style="display: inline-block; width: 120px; text-align: left">
-		         Radius = <span id="radius-value">…</span>
+		         Circle radius = <span id="radius-value">…</span>
 		  </label>
 		  <input type="range" min="0" max="50" step="1" value="0" id="radius">
 		</p>	
@@ -88,9 +92,9 @@
 
 			//Dynamic, random dataset
 			var means = [];
-			var dataset = [];		   //Initialize empty array
-			var numDataPoints = 10; //Number of dummy data points to create
-			var maxRange = 100;		 //Max range of new values
+			var dataset = [];		    // Initialize empty array
+			var numDataPoints = 10; // Number of dummy data points to create
+			var maxRange = 100;		  // Max range of new values
 			
 
 			// Sample Size slider update
@@ -101,14 +105,14 @@
 			update(10);
 
 			function update(n) {
-			  // adjust the text on the range slider
+			  // Adjust the text on the range slider
 			  d3.select("#sampleSize-value").text(n);
 			  d3.select("#sampleSize-value1").text(n);
 			  numDataPoints = n;
 			}
 
 
-			//Create scale functions
+			// Create scale functions
 			var rScale = d3.scale.linear()
 								 .domain([0, maxRange])
 								 .range([0, w - (2 * padding)]);
@@ -121,97 +125,104 @@
 								 .domain([0, maxRange])
 								 .range([h - padding, padding]);
 
-			//Define X axis
+			// Define X axis
 			var xAxis = d3.svg.axis()
 							  .scale(xScale)
 							  .orient("bottom")
 							  .tickValues(tickVals);
 
-			//Define Y axis
+			// Define Y axis
 			var yAxis = d3.svg.axis()
 							  .scale(yScale)
 							  .orient("left")
 							  .tickValues(tickVals);
 
-			//Create SVG element
+			// Create SVG element
 			var svg = d3.select("body")
-						.append("svg")
-						.attr("width", w)
-						.attr("height", h);
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
 
-			//Create SVG element
+			// Create SVG element
 			var cdf = d3.select("body")
 					.append("svg")
 					.attr("width", w)
 					.attr("height", h);
 
 
-			//Create X axis
+			// Create X axis
 			svg.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(0," + (h - padding) + ")")
 				.call(xAxis);
 			
-			//Create Y axis
+			// Create Y axis
 			svg.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(" + padding + ",0)")
 				.call(yAxis);
 
-			//Box-Muller Transform (Uniform -> Normal)
-
-			var normal = function (mean, variance) {
-				std = Math.sqrt(variance)
-				u1 = Math.random()
-				u2 = Math.random()
-				z = Math.sqrt(-2*Math.log(u1))*Math.sin(2*Math.PI*u2)
-				return z*std + mean ;
+			// Box-Muller Transform (Uniform -> Normal)
+			function normal(mean, variance) {
+				std = Math.sqrt(variance);
+				u1 = Math.random();
+				u2 = Math.random();
+				z = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+				return (z * std) + mean;
 			}
 
-			//Inverse Exponential Transform (Uniform -> Exponetial)
-
-			var exponential = function (lambda) {
-				x = -1/lambda * Math.log(Math.random())
+			// Inverse Exponential Transform (Uniform -> Exponetial)
+			function exponential(lambda) {
+				x = -1/lambda * Math.log(Math.random());
 				return x;
 			}
 
 
-			//On click, update with new data			
+			// On click, generate data points, average, and animate		
 			d3.select("p.n1")
 				.on("click", function() {
 					svg.selectAll("circle.meanpointsmean")
-			   			.remove();
-			   		updateradius(0); 
-			   		updatepercentage(0);
-			   		document.getElementById("radius").value = "0";
+			   		 .remove();
+			   	updateradius(0); 
+			   	updatepercentage(0);
+			   	document.getElementById("radius").value = "0";
 
 					dataset = [];  						 				
 					for (var i = 0; i < numDataPoints; i++) {		
+						// Create new x value depending on distribution
 						if (document.getElementById('xUniform').checked) {
-							var newNumber1 = Math.random()*maxRange ;}
-						if (document.getElementById('xNormal').checked) {
-							var newNumber1 = normal((maxRange/2), (maxRange)) ;}
-						if (document.getElementById('xExponential').checked) {
-							var newNumber1 = exponential(2/maxRange) ;}
-
+							// ~Unif(0,100)
+							var newX = Math.random() * maxRange;
+						} else if (document.getElementById('xNormal').checked) {
+							// ~N(50, var = 100)
+							var newX = normal((maxRange/2), (maxRange));
+						} else if (document.getElementById('xExponential').checked) {
+							// ~Exp(0.02)
+							var newX = exponential(2/maxRange);
+						}
+						// Create new y value depending on distribution
 						if (document.getElementById('yUniform').checked) {
-							var newNumber2 = Math.random()*maxRange ;}
-						if (document.getElementById('yNormal').checked) {
-							var newNumber2 = normal((maxRange/2), (maxRange)) ;}
-						if (document.getElementById('yExponential').checked) {
-							var newNumber2 = exponential(2/maxRange) ;}
+							// ~Unif(0,100)
+							var newY = Math.random() * maxRange ;
+						} else if (document.getElementById('yNormal').checked) {
+							// ~N(50, var = 100)
+							var newY = normal((maxRange/2), (maxRange));
+						} else if (document.getElementById('yExponential').checked) {
+							// ~Exp(0.02)
+							var newY = exponential(2/maxRange);
+						}
 
-						dataset.push([newNumber1, newNumber2]);	
+						dataset.push([newX, newY]);	
 					}
 
 					var sumX = 0.0;
 					var sumY = 0.0;
-					for (var i = 0; i < dataset.length; i++){
-						sumX = sumX + dataset[i][0];
-						sumY = sumY + dataset[i][1];
+					for (var i = 0; i < dataset.length; i++) {
+						sumX += dataset[i][0];
+						sumY += dataset[i][1];
 					}
-					var meanX = sumX / dataset.length
-					var meanY = sumY / dataset.length
+					var meanX = sumX / dataset.length;
+					var meanY = sumY / dataset.length;
 					means.push([meanX,meanY]);					
 
 					svg.selectAll("circle.datapoints")
@@ -230,7 +241,7 @@
 			   	svg.selectAll("circle.datapoints")
 					   .transition()
 					   .delay(300)
-   					 .duration(1000)
+   					 .duration(600)
 					   .attr("cx", xScale(meanX))
 					   .attr("cy", yScale(meanY))
 					   .remove()
@@ -242,82 +253,81 @@
 			   					.attr("fill", "rgba(0, 0, 0, " + alpha/numDataPoints + ")")
 			   					.attr("class", "meanpoints");
 					   });
-
-
-					
-
 				});
 
+			// Generate 1000 averages, no animation
 			d3.select("p.n1000")
 				.on("click", function() {
-
-			   	svg.selectAll("circle.datapoints")
-			   		.remove();
-				svg.selectAll("circle.meanpointsmean")
+					svg.selectAll("circle.meanpointsmean")
 			   		.remove();
 			   	updateradius(0); 
 			   	updatepercentage(0);
 			   	document.getElementById("radius").value = "0";
 
-				for (var j = 0; j < 1000; j++) {
-					dataset = [];  						 				
-					for (var i = 0; i < numDataPoints; i++) {		
-						if (document.getElementById('xUniform').checked) {
-							var newNumber1 = Math.random()*maxRange ;}
-						if (document.getElementById('xNormal').checked) {
-							var newNumber1 = normal((maxRange/2), (maxRange)) ;}
-						if (document.getElementById('xExponential').checked) {
-							var newNumber1 = exponential(2/maxRange) ;}
+					for (var j = 0; j < 1000; j++) {
+						dataset = [];  						 				
+						for (var i = 0; i < numDataPoints; i++) {		
+							// Create new x value depending on distribution
+							if (document.getElementById('xUniform').checked) {
+								// ~Unif(0,100)
+								var newX = Math.random() * maxRange;
+							} else if (document.getElementById('xNormal').checked) {
+								// ~N(50, var = 100)
+								var newX = normal((maxRange/2), (maxRange));
+							} else if (document.getElementById('xExponential').checked) {
+								// ~Exp(0.02)
+								var newX = exponential(2/maxRange);
+							}
+							// Create new y value depending on distribution
+							if (document.getElementById('yUniform').checked) {
+								// ~Unif(0,100)
+								var newY = Math.random() * maxRange ;
+							} else if (document.getElementById('yNormal').checked) {
+								// ~N(50, var = 100)
+								var newY = normal((maxRange/2), (maxRange));
+							} else if (document.getElementById('yExponential').checked) {
+								// ~Exp(0.02)
+								var newY = exponential(2/maxRange);
+							}
 
-						if (document.getElementById('yUniform').checked) {
-							var newNumber2 = Math.random()*maxRange ;}
-						if (document.getElementById('yNormal').checked) {
-							var newNumber2 = normal((maxRange/2), (maxRange)) ;}
-						if (document.getElementById('yExponential').checked) {
-							var newNumber2 = exponential(2/maxRange) ;}
+							dataset.push([newX, newY]);	
+						}
 
-						dataset.push([newNumber1, newNumber2]);	
+						var sumX = 0.0;
+						var sumY = 0.0;
+						for (var i = 0; i < dataset.length; i++) {
+							sumX += dataset[i][0];
+							sumY += dataset[i][1];
+						}
+						var meanX = sumX / dataset.length;
+						var meanY = sumY / dataset.length;
+						means.push([meanX, meanY]);
+
+						svg.append("circle")
+				   		.attr("cx", xScale(meanX))
+				   		.attr("cy", yScale(meanY))
+				   		.attr("r", 4)
+				   		.attr("fill", "rgba(0, 0, 0, " + alpha + ")")
+				   		.attr("class", "meanpoints");
 					}
-
-					var sumX = 0.0;
-					var sumY = 0.0;
-					for (var i=0; i < dataset.length; i++){
-						sumX = sumX + dataset[i][0];
-						sumY = sumY + dataset[i][1];
-					}
-					var meanX = sumX / dataset.length
-					var meanY = sumY / dataset.length
-					means.push([meanX,meanY]);
-
-					svg.append("circle")
-			   		.attr("cx", xScale(meanX))
-			   		.attr("cy", yScale(meanY))
-			   		.attr("r", 4)
-			   		.attr("fill", "rgba(0, 0, 0, " + alpha + ")")
-			   		.attr("class", "meanpoints");
-				}
-
 				});
 
 
 			d3.select("#radius").on("input", function() {
-  			
-  				updateradius(+this.value);
+  			updateradius(+this.value);
 
+  			// remove the red circle
 				svg.selectAll("circle.meanpointsmean")
-			   		.remove();
-
+			   	.remove();
 
 				var sumXmeans = 0.0;
 				var sumYmeans = 0.0;
-	
-
-				for (var i=0; i < means.length; i++){
-					sumXmeans = sumXmeans + means[i][0];
-					sumYmeans = sumYmeans + means[i][1];
+				for (var i = 0; i < means.length; i++){
+					sumXmeans += means[i][0];
+					sumYmeans += means[i][1];
 				}
 
-				if (means.length > 0){
+				if (means.length > 0) {
 					var meanXmeans = sumXmeans / means.length;
 					var meanYmeans = sumYmeans / means.length;
 
@@ -327,21 +337,26 @@
 			   			.attr("r", rScale(radius))
 			   			.attr("fill", "rgba(255, 0, 0, 0.5)")
 			   			.attr("class", "meanpointsmean");
-			   		
 
-					pointscontained = 0
+					pointsContained = 0
 
-					for (var i=0; i < means.length; i++){
-						if (Math.sqrt(Math.pow(means[i][0]-meanXmeans,2) + Math.pow(means[i][1]-meanYmeans,2)) < radius){
-							pointscontained = pointscontained + 1 ;
-						} ;
+					for (var i = 0; i < means.length; i++) {
+						// (x0,y0) is the center of the circle
+						var x0 = meanXmeans;
+						var y0 = meanYmeans;
+						// (x,y) is the position of one of the mean data points
+						var x = means[i][0];
+						var y = means[i][1];
+						var toPoint = Math.sqrt(Math.pow(x - x0, 2) + Math.pow(y - y0, 2))
+
+						if (toPoint < radius) {
+							pointsContained += 1;
+						}
 					}
 
-					percentage = Math.round((pointscontained / means.length) * 10000) / 100
+					percentage = Math.round((pointsContained / means.length) * 10000) / 100;
 					updatepercentage(percentage);
-
-					}
-
+				}
 			});
 
 			updateradius(0);
@@ -351,7 +366,6 @@
 			  d3.select("#radius-value").text(n);
 			  radius = n;
 			}
-			updatepercentage(0)
 
 			function updatepercentage(n) {
 			  // adjust the text on the range slider
@@ -360,20 +374,16 @@
 
 			d3.select("p.reset")
 				.on("click", function() {
-
 			   	svg.selectAll("circle")
-			   		.remove(); 	
+			   		 .remove(); 	
 			   	updateradius(0); 
 			   	updatepercentage(0);
 			   	update(10);
 			   	document.getElementById("radius").value = "0";
 			   	document.getElementById("sampleSize").value = "10";
-			   	datapoints=[];
-			   	means=[];
-			   	});
-
-
-
+			   	datapoints = [];
+			   	means = [];
+			  });
 		</script>
 	</body>
 </html>
