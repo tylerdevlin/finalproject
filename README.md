@@ -14,10 +14,7 @@ To view the complete visualization, click here (embed visualization here or prov
 
 ## The Theorem
 
-Description of data...
-
-- Data source (simulated/ published/ unpublished?)
-- Data structure - what are the variables? How are they organized? What states can they have
+This visualization is not meant to replace a rigorous mathematical development of the Central Limit Theorem. Rather, it is designed to supplement a more analytical approach to understanding the theorem. As such, we assume that the reader already 
 
 ## Background
 
