@@ -41,32 +41,63 @@
 				margin-left: 3%;
 			}
 
-			.labels { 
-				width: 20%;
-				background-color: #eee;
-				}
+			.labels { width: 20%;}
 			.plot { width: 48%;}
 			.statistics { width: 20%; }
 
+			.btn {
+  				-webkit-border-radius: 5;
+				-moz-border-radius: 5;
+				border-radius: 5px;
+				font-family: Arial;
+				color: #ffffff;
+				font-size: 14px;
+				background: #3498db;
+				width: 100%;
+				padding: 10px 20px 10px 20px;
+				text-decoration: none;
+				cursor: pointer;
+				outline: none;
+				}
+
+			.btn:hover {
+  				background: #3cb0fd;
+  				text-decoration: none;
+				}
+
+			input[type=range] {
+			  -webkit-appearance: none;
+			  width: 100%;
+			  margin: 9px 0;
+			  outline: none;
+			}
+			input[type=range]::-webkit-slider-runnable-track {
+			  width: 100%;
+			  height: 7px;
+			  cursor: pointer;
+			  background: #3498db;
+			  border-radius: 4.7px;
+			  border: 1px solid #570101;
+			}
+			input[type=range]::-webkit-slider-thumb {
+			  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+			  border: 0.9px solid #000000;
+			  height: 25px;
+			  width: 10px;
+			  border-radius: 2px;
+			  background: #ffffff;
+			  cursor: pointer;
+			  -webkit-appearance: none;
+			  margin-top: -10px;
+			}
 		
 
 		</style>
 	</head>
 	<body>
-		<h1>A 2-Dimensional Visualization of the Central Limit Theorem</h1>
+		<h1 align = "center">A 2-Dimensional Visualization of the Central Limit Theorem</h1>
 		<div class = "labels">
 
-			<button class="cool-button" type = "button" onclick = "n1()">Click to generate the average of <span id="sampleSize-value">…</span> points!
-			</button>
-
-			<button class="cool-button" type = "button" onclick = "n1000()">Click to generate one thousand averages!
-			</button>
-
-			<button class="cool-button" type = "button" onclick = "reset()">Reset
-			</button>
-
-
-			<!-- sample size slider -->
 			<p>
 			  <label for="sampleSize" 
 			         style="display: inline-block; width: 120px; text-align: left">
@@ -75,29 +106,23 @@
 			  <input type="range" min="1" max="20" step="1" value="10" id="sampleSize">
 			</p>	
 
-			<p>
-			  <label> X-Axis Probability Distribution: </label>
-				<form>
-				  <input type="radio" id="xUniform" name="xAxis" value="uniform" checked > Uniform 
-				  <input type="radio" id="xNormal" name="xAxis" value="normal">
-				  Normal 
-				  <input type="radio" id="xExponential" name="xAxis" value="exponential"> Exponential
-				</form>
-			</p>	
+			<button class="btn" type = "button" onclick = "n1()">Average <span id="sampleSize-value">…</span> points
+			</button>
 
-			<p>
-			  <label> Y-Axis Probability Distribution: </label>
-				<form>
-				  <input type="radio" id="yUniform" name="yAxis" value="uniform" checked > Uniform 
-				  <input type="radio" id="yNormal" name="yAxis" value="normal"> 
-				  Normal 
-				  <input type="radio" id="yExponential" name="yAxis" value="exponential"> Exponential
-				</form>
-			</p>
+			<p></p>
+
+			<button class="btn" type = "button" onclick = "n1000()">One thousand averages!
+			</button>
+
+			<p></p>
+
+			<button class="btn" type = "button" onclick = "reset()">Reset
+			</button>
+
 
 		</div>
 
-		<div class = "plot">
+		<div class = "plot" style="text-align:center;">
 		</div>
 
 		<div class = "statistics">
@@ -211,20 +236,6 @@
 					.attr("transform", "translate(" + padding + ",0)")
 					.call(yAxis);
 
-				// Box-Muller Transform (Uniform -> Normal)
-				function normal(mean, variance) {
-					std = Math.sqrt(variance);
-					u1 = Math.random();
-					u2 = Math.random();
-					z = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
-					return (z * std) + mean;
-				}
-
-				// Inverse Exponential Transform (Uniform -> Exponetial)
-				function exponential(lambda) {
-					x = -1/lambda * Math.log(Math.random());
-					return x;
-				}
 
 
 				// On click, generate data points, average, and animate		
@@ -237,29 +248,8 @@
 
 						dataset = [];  						 				
 						for (var i = 0; i < numDataPoints; i++) {		
-							// Create new x value depending on distribution
-							if (document.getElementById('xUniform').checked) {
-								// ~Unif(0,100)
-								var newX = Math.random() * maxRange;
-							} else if (document.getElementById('xNormal').checked) {
-								// ~N(50, var = 100)
-								var newX = normal((maxRange/2), (maxRange));
-							} else if (document.getElementById('xExponential').checked) {
-								// ~Exp(0.02)
-								var newX = exponential(2/maxRange);
-							}
-							// Create new y value depending on distribution
-							if (document.getElementById('yUniform').checked) {
-								// ~Unif(0,100)
-								var newY = Math.random() * maxRange ;
-							} else if (document.getElementById('yNormal').checked) {
-								// ~N(50, var = 100)
-								var newY = normal((maxRange/2), (maxRange));
-							} else if (document.getElementById('yExponential').checked) {
-								// ~Exp(0.02)
-								var newY = exponential(2/maxRange);
-							}
-
+							var newX = Math.random() * maxRange;
+							var newY = Math.random() * maxRange ;
 							dataset.push([newX, newY]);	
 						}
 
@@ -313,31 +303,10 @@
 				   	document.getElementById("radius").value = "0";
 
 						for (var j = 0; j < 1000; j++) {
-							dataset = [];  						 				
+							dataset = []; 			
 							for (var i = 0; i < numDataPoints; i++) {		
-								// Create new x value depending on distribution
-								if (document.getElementById('xUniform').checked) {
-									// ~Unif(0,100)
-									var newX = Math.random() * maxRange;
-								} else if (document.getElementById('xNormal').checked) {
-									// ~N(50, var = 100)
-									var newX = normal((maxRange/2), (maxRange));
-								} else if (document.getElementById('xExponential').checked) {
-									// ~Exp(0.02)
-									var newX = exponential(2/maxRange);
-								}
-								// Create new y value depending on distribution
-								if (document.getElementById('yUniform').checked) {
-									// ~Unif(0,100)
-									var newY = Math.random() * maxRange ;
-								} else if (document.getElementById('yNormal').checked) {
-									// ~N(50, var = 100)
-									var newY = normal((maxRange/2), (maxRange));
-								} else if (document.getElementById('yExponential').checked) {
-									// ~Exp(0.02)
-									var newY = exponential(2/maxRange);
-								}
-
+								var newX = Math.random() * maxRange;
+								var newY = Math.random() * maxRange ;
 								dataset.push([newX, newY]);	
 							}
 
