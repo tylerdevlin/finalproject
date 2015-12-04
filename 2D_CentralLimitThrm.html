@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>D3: Transitioning points to randomized values</title>
+		<title>D3: Central Limit Theorem</title>
 
 		<!-- Load the d3.js script -->
 		<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -126,13 +126,15 @@
 		</div>
 
 		<div class = "statistics">
-			<p class="mean">Percentage of averages contained by circle: <span id="radius-percentage">0</span>%</p>
+			<button class="btn" type = "button" onclick = "stats()">Get the statistics
+			</button>
+			<p class="mean">Percentage of averages contained by box: <span id="radius-percentage">0</span>%</p>
 			<p>
 			  <label for="radius" 
 			         style="display: inline-block; width: 120px; text-align: left">
-			         Circle radius = <span id="radius-value">…</span>
+			         Box length = <span id="radius-value">…</span>
 			  </label>
-			  <input type="range" min="0" max="50" step="1" value="0" id="radius">
+			  <input type="range" min="0" max="100" step="1" value="0" id="radius">
 			</p>
 		</div>
 		<script type="text/javascript">
@@ -294,6 +296,7 @@
 					};
 
 
+
 				// Generate 1000 averages, no animation
 				function n1000() {
 						svg.selectAll("circle.meanpointsmean")
@@ -330,51 +333,148 @@
 						}
 					};
 
+				function cdf() {
+
+					var cdfData = [];
+
+					for (var s = 0; s <= 100; s++){
+						pointsContained = 0;
+						percentage = 0;
+
+						if (means.length > 0) {
+							for (var i = 0; i < means.length; i++) {
+								var x = means[i][0];
+								var y = means[i][1];
+
+								if ((x < s) && (y < s)) {
+									pointsContained += 1;
+								}
+							}
+							percentage =(pointsContained / means.length);
+						}
+						cdfData.push([s,percentage]);
+					}	
+					return cdfData;
+				};
+				
+
+				function stats() {
+
+				d3.selectAll("#cdf-svg")
+				   	.remove();
+
+				var cdfTickVals = [0, 25, 50, 75, 100];
+				var cdfW = 250;
+				var cdfH = 250;
+				var cdfPadding = 25;
+				var cdfTopPadding = 5;
+				var cdfMaxRange = 100;	
+
+				var cdfXScale = d3.scale.linear()
+									 .domain([0, cdfMaxRange])
+									 .range([cdfPadding, cdfW-cdfTopPadding]);
+
+				var cdfYScale = d3.scale.linear()
+									 .domain([0, 1])
+									 .range([cdfH - cdfPadding, cdfTopPadding]);
+
+				// Define X axis
+				var cdfXAxis = d3.svg.axis()
+								  .scale(cdfXScale)
+								  .orient("bottom")
+								  .tickValues(cdfTickVals);
+
+				// Define Y axis
+				var cdfYAxis = d3.svg.axis()
+								  .scale(cdfYScale)
+								  .orient("left");
+
+				// Create SVG element
+				var cdfSvg = d3.select(".statistics")
+								.append("svg")
+								.attr("id","cdf-svg")
+								.attr("width", cdfW)
+								.attr("height", cdfH);
+
+				var cdfSvg = d3.select(".statistics")
+								.append("svg")
+								.attr("id","cdf-svg")
+								.attr("width", cdfW)
+								.attr("height", cdfH);
+
+				cdfSvg.append("clipPath")
+					.attr("id", "cdf-chart-area")
+					.append("rect")
+					.attr("x", cdfPadding)
+					.attr("y", cdfTopPadding)
+					.attr("width", cdfW-cdfTopPadding-cdfPadding)
+					.attr("height", cdfH-cdfTopPadding-cdfPadding)
+
+
+				// Create X axis
+				cdfSvg.append("g")
+					.attr("class", "axis")
+					.attr("transform", "translate(0," + (cdfH - cdfPadding) + ")")
+					.call(cdfXAxis);
+				
+				// Create Y axis
+				cdfSvg.append("g")
+					.attr("class", "axis")
+					.attr("transform", "translate(" + cdfPadding + ",0)")
+					.call(cdfYAxis);
+
+				var line = d3.svg.line()
+						    .x(function(d) { return cdfXScale(d[0]); })
+						    .y(function(d) { return cdfYScale(d[1]); })
+						    .interpolate("linear");
+
+				var area = d3.svg.area()
+						    .x(function(d) { return cdfXScale(d[0]); })
+						    .y0(cdfH - cdfPadding)
+						    .y1(function(d) { return cdfYScale(d[1]); });
+
+
+				cdfSvg.append("path")
+				    .attr("d", line(cdf()))
+				    .attr("d", area(cdf()))
+				    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+				    .attr("fill", "rgba(255, 0, 0, 0.5)");
+
+				}
+
 
 				d3.select("#radius").on("input", function() {
 	  			updateradius(+this.value);
 
 	  			// remove the red circle
-					svg.selectAll("circle.meanpointsmean")
+					svg.selectAll("rect.box")
 				   	.remove();
 
-					var sumXmeans = 0.0;
-					var sumYmeans = 0.0;
-					for (var i = 0; i < means.length; i++){
-						sumXmeans += means[i][0];
-						sumYmeans += means[i][1];
-					}
-
-					if (means.length > 0) {
-						var meanXmeans = sumXmeans / means.length;
-						var meanYmeans = sumYmeans / means.length;
-
-						svg.append("circle")
-				   			.attr("cx", xScale(meanXmeans))
-				   			.attr("cy", yScale(meanYmeans))
-				   			.attr("r", rScale(radius))
+						svg.append("rect")
+				   			.attr("x", xScale(0))
+				   			.attr("y", yScale(radius))
+				   			.attr("width", rScale(radius))
+				   			.attr("height", rScale(radius))
 				   			.attr("fill", "rgba(255, 0, 0, 0.5)")
-				   			.attr("class", "meanpointsmean");
+				   			.attr("class", "box");
 
-						pointsContained = 0
+						pointsContained = 0;
+						percentage = 0;
 
-						for (var i = 0; i < means.length; i++) {
-							// (x0,y0) is the center of the circle
-							var x0 = meanXmeans;
-							var y0 = meanYmeans;
-							// (x,y) is the position of one of the mean data points
-							var x = means[i][0];
-							var y = means[i][1];
-							var toPoint = Math.sqrt(Math.pow(x - x0, 2) + Math.pow(y - y0, 2))
+						if (means.length > 0) {
+							for (var i = 0; i < means.length; i++) {
+								var x = means[i][0];
+								var y = means[i][1];
 
-							if (toPoint < radius) {
-								pointsContained += 1;
+								if ((x < radius) && (y < radius)) {
+									pointsContained += 1;
+								}
 							}
+							percentage = Math.round((pointsContained / means.length) * 10000) / 100;
 						}
 
-						percentage = Math.round((pointsContained / means.length) * 10000) / 100;
 						updatepercentage(percentage);
-					}
 				});
 
 				updateradius(0);
@@ -383,12 +483,12 @@
 				  // adjust the text on the range slider
 				  d3.select("#radius-value").text(n);
 				  radius = n;
-				}
+				};
 
 				function updatepercentage(n) {
 				  // adjust the text on the range slider
 				  d3.select("#radius-percentage").text(n);
-				}
+				};
 
 				function reset() {
 				   	svg.selectAll("circle")
@@ -400,6 +500,8 @@
 				   	document.getElementById("sampleSize").value = "10";
 				   	datapoints = [];
 				   	means = [];
+				   	d3.selectAll("#cdf-svg")
+				   		.remove();
 				  };
 			</script>
 	</body>
