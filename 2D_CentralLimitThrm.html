@@ -146,6 +146,7 @@
 				var padding = 50;
 				var topPadding = 10;
 				var alpha = 0.1;
+				var delay = 1; // delay in ms for generating 1000 points
 
 				//Dynamic, random dataset
 				var means = [];
@@ -328,10 +329,14 @@
 					   		.attr("cx", xScale(meanX))
 					   		.attr("cy", yScale(meanY))
 					   		.attr("r", 4)
-					   		.attr("fill", "rgba(0, 0, 0, " + alpha + ")")
-					   		.attr("class", "meanpoints");
+					   		.attr("fill", "rgba(0, 0, 0, " + 0 + ")")
+					   		.attr("class", "meanpoints")
+					   		.transition()
+ 								.delay(j*delay)
+ 								.attr("fill", "rgba(0, 0, 0, " + alpha + ")");
 						}
 					};
+
 
 				function cdf() {
 
